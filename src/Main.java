@@ -148,11 +148,11 @@ public class Main {
         // MENYIMPAN SOLUSI
         String inputFilename = Paths.get(filename).getFileName().toString().replaceAll("\\.txt$", ""); // Get file name
         if (menyimpanSolusi.equalsIgnoreCase("ya")){
-            try (FileWriter writer = new FileWriter(String.format("test_output/%s_output.txt", inputFilename))) {
+            try (FileWriter writer = new FileWriter(String.format("test/%s_output.txt", inputFilename))) {
                     writer.write(board.boardToText());
                     System.out.println("File saved successfully as 'output.txt'.");
             }
-            PrettyOutput.generatePuzzleImage(board.board, String.format("test_output/%s.png", inputFilename));
+            PrettyOutput.generatePuzzleImage(board.board, String.format("test/%s.png", inputFilename));
         }
     }
 
