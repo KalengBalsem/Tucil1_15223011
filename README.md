@@ -16,7 +16,8 @@ Algoritma mencoba semua kemungkinan penyusunan blok dengan **rotasi dan pencermi
 *Workspace* ini berisi folder-folder berikut:
 - `src`: Berisi source code program.
 - `bin`: Menyimpan file eksekusi yang telah dikompilasi (disesuaikan dengan bahasa pemrograman yang digunakan).
-- `test`: Berisi solusi jawaban dari data uji yang digunakan dalam laporan.
+- `test`: Berisi solusi jawaban dari test input ".txt" dan/atau ".png"
+- `test_input`: Berisi test input dengan format ".txt"
 - `doc`: Berisi laporan tugas kecil dalam format PDF.
 
 ## Program Requirements & Dependencies
