@@ -1,6 +1,8 @@
 ## Getting Started
 
-Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
+Beberapa batasan:
+- tiap input yang memiliki bentuk berbeda harus memiliki representasi alfabet yang berbeda juga (tidak ada bentuk yang berbeda dengan alfabet yang sama)
+- tidak ada dua blok dengan huruf alfabet yang sama.
 
 ## Folder Structure
 

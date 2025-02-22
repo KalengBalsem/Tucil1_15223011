@@ -1,0 +1,16 @@
+4 6 5
+DEFAULT
+AAA
+ A
+ A
+BBB
+B
+B
+CC
+CC
+DDD
+  D
+  D
+EEE
+E
+E

@@ -19,31 +19,45 @@ public class Main {
         */
 
         // menyortir parameter utama N M P dan S
-        long N = Long.parseLong(String.valueOf(parsedFile[0].charAt(0)));
-        long M = Long.parseLong(String.valueOf(parsedFile[0].charAt(2)));
-        long P = Long.parseLong(String.valueOf(parsedFile[0].charAt(4)));
+        // Split the first line on whitespace
+        String[] tokens = parsedFile[0].trim().split("\\s+");
 
+        // Parse N, M, P
+        int N = Integer.parseInt(tokens[0]);
+        int M = Integer.parseInt(tokens[1]);
+        int P = Integer.parseInt(tokens[2]);
+
+        // Read the puzzle type (DEFAULT, CUSTOM, or PYRAMID)
         String S = parsedFile[1];
+
+        int startParsingBlocks = 0;
+        if (S.equalsIgnoreCase("DEFAULT")) {
+            startParsingBlocks = 2;
+        }
+        else if (S.equalsIgnoreCase("CUSTOM")) {
+            startParsingBlocks = 2 + N; // block dalam .txt berada di bawah konfigurasi papan CUSTOM yang setinggi N.
+            
+        } 
+        else {
+            throw new java.lang.Error("Board category invalid. Board category seharusnya DEFAULT atau CUSTOM.");
+        }
 
         // MEMPROSES BLOK PUZZLE
         /* 
          * TODO:
-         * - dont repeat yourself (DRY), make functions for repititive lines of code -> make functions for rotating and mirror
          * - bagaimana jika input hanya " A" (hanya satu subblok A) tapi terbaca (0,1) alih-alih (0,0)
-         * DONE:
-         * - array and dictionary format in Java to process and store block arrangement data
         */
 
-        // menyortir blok dan setor data blok
+        // menyortir blok dan menyetor data arrangement pertama tiap blok
         int row = 0;
         int column = 0;
-        ArrayList<Character> block_id = new ArrayList<>();
+        ArrayList<Character> block_ids = new ArrayList<>();
         HashMap<Character, ArrayList<ArrayList<Pair>>> blocks = new HashMap<>();
 
         int variation_num = 0;
-        char id = 'a';  // initialize id
+        char id = ' ';  // initialize id
 
-        for (int i = 2; i < parsedFile.length; i++) {
+        for (int i = startParsingBlocks; i < parsedFile.length; i++) {
             for (char ch: parsedFile[i].toCharArray()){
                 if (Character.isAlphabetic(ch)) {
                     id = ch;
@@ -51,10 +65,10 @@ public class Main {
                 }
             }
 
-            if (!block_id.contains(id)) {
+            if (!block_ids.contains(id)) {
                 row = 0;
                 column = 0;
-                block_id.add(id);
+                block_ids.add(id);
                 blocks.putIfAbsent(id, new ArrayList<>());
                 blocks.get(id).add(new ArrayList<>());
             }
@@ -75,120 +89,75 @@ public class Main {
             // take id and entry
             id = entry.getKey();
             ArrayList<ArrayList<Pair>> arrangements = entry.getValue();
-
-            int max_row = 0, max_column = 0;
-            for (Pair p : arrangements.get(0)) {
-                if (p.row() > max_row) {
-                    max_row = p.row();
-                }
-                if (p.column() > max_column) {
-                    max_column = p.column();
-                }
-            }
-
-            // ROTATION (WORKING ON MAKING 1 GENERAL FUNCTION)
-            // cek jumlah rotasi berdasarkan susunan blok dari nilai unik pojok2 posisi.
-            Pair corner1 = new Pair(0, 0);
-            Pair corner2 = new Pair(0, max_row); // rotated 90 (column -> row, & vice versa)
-            Pair corner3;
-            if (max_row != 0) {
-                corner3 = new Pair(max_row, max_column);
-            } else {
-                corner3 = corner1;
-            } // rotated 180  (max_row and max_column != 0)
-            Pair corner4 = new Pair(max_column, 0); // rotated 270 (row -> column, & vice versa)
-            
-            ArrayList<Pair> raw_corners = new ArrayList<>(Arrays.asList(corner1, corner2, corner3, corner4));
-
-            ArrayList<Pair> corners = new ArrayList<>();
-            for (Pair corner: raw_corners) {
-                if (!corners.contains(corner)){
-                    corners.add(corner);
-                }
-            }
-
-            for (int i = 0; i < corners.size() - 1; i++) {
-                blocks.get(id).add(new ArrayList<>());
-            }
-
-            // operasi "rotasi" (loop berdasarkan jumlah rotasi)
-            for (Pair position : arrangements.get(0)) {
-                int a = position.row(), b = position.column();
-                for (Pair corner : corners) {
-                    int new_row, new_column;
-                    int x = corner.row(), y = corner.column();
-                    if (x == 0 && y == 0) {
-                        continue;
-                    }
-                    else if (x == 0) {
-                        new_row = x + b;
-                        new_column = y - a;
-                    }
-                    else if (y == 0) {
-                        new_row = x - b;
-                        new_column = y + a;
-                    }
-                    else {
-                        new_row = x - a;
-                        new_column = y - b;
-                    }
-
-                    variation_num++;
-                    blocks.get(id).get
-                    (variation_num).add(new Pair(new_row, new_column));
-                }
-                variation_num = 0;
+            ArrayList<ArrayList<Pair>> newVariations = new ArrayList<>();
+            // ROTATION
+            int num_of_rotation = 3; // variasi rotasi <= 3
+            ArrayList<Pair> arrangement = arrangements.get(0); // starting arrangement
+            for (int i = 0; i < num_of_rotation; i ++) {
+                arrangement = Transform.rotateCW(arrangement);
+                newVariations.add(arrangement);
             }
             // // END ROTATION
-
-            // MIRROR (WORKING ON MAKING 1 GENERAL FUNCTION)
-            // operasi "mirror" untuk tiap variasi rotasi termasuk rotasi 0, 90, 180, 270.
-            arrangements = entry.getValue();
-            ArrayList<ArrayList<Pair>> newVariations = new ArrayList<>();
-
-            for (ArrayList<Pair> arrangement : arrangements) {
-                max_row = 0;
-                max_column = 0;
-                for (Pair position : arrangement) {
-                    if (position.row() > max_row) {
-                        max_row = position.row();
-                    }
-                    if (position.column() > max_column) {
-                        max_column = position.column();
-                    }
-                }
-                // vertical mirror (cerminkan kolom)
-                ArrayList<Pair> newVariation = new ArrayList<>();
-                for (Pair position : arrangement) {
-                    int new_column = max_column - position.column();
-                    newVariation.add(new Pair(position.row(), new_column));
-                }
-                newVariations.add(newVariation);
-
-                // horizontal mirror (cerminkan baris)
-                newVariation = new ArrayList<>();
-                for (Pair position : arrangement) {
-                    int new_row = max_row - position.row();
-                    newVariation.add(new Pair(new_row, position.column()));
-                }
-                newVariations.add(newVariation);
+            blocks.get(id).addAll(newVariations); // add rotation variations to the arrangements (before they are mirrored.)
+            newVariations = new ArrayList<>();
+            // MIRROR
+            for (ArrayList<Pair> arr : arrangements) {
+                arrangement = Transform.mirrorV(arr);
+                newVariations.add(arrangement);
+                arrangement = Transform.mirrorH(arr);
+                newVariations.add(arrangement);
             }
-            blocks.get(id).addAll(newVariations);
-            variation_num = 0;
+            // // END MIRROR
+            blocks.get(id).addAll(newVariations); // add mirror variations to the arrangements.
         }
-        // // END MIRROR
 
-        // membersihkan kemungkinan variasi tiap blok (agar tidak ada variasi duplikat)
-        for (Map.Entry<Character, ArrayList<ArrayList<Pair>>> entry : blocks.entrySet()) {
-            // take id and entry
-            id = entry.getKey();
-            ArrayList<ArrayList<Pair>> arrangements = entry.getValue();
+        // membersihkan variasi tiap blok (agar tidak ada variasi duplikat)
+        blocks = Transform.cleanBlockVariations(blocks);
 
-            System.out.println(id);
-            System.out.println(arrangements);
+        // PENYUSUNAN BLOK DALAM PAPAN
+        /*
+         * parameter yang harus diperhatikan:
+         * - blok2 yang sudah diletakkan di dalam papan (sehingga mesin tidak meletakkan blok duplikat)
+         * - keep track of variations that we have tried. (A_1 B_2 ...) if fail we try (A_2 B_1) etc but we're not going to use A_1 as the first placement again.
+         /*
+          STEPS:
+            - build block (DONE)
+            - search posisi yang masi kosong urut kiri ke kanan dan atas ke bawah.
+            - loop untuk memposisikan blok
+            - cek apakah posisi valid (tidak ada bagian blok yang menempati posisi yang sudah terisi).
+                jika valid -> isi; else -> loop variasi hingga memenuhi. (jika tidak ada variasi yang memenuhi -> pindah ke id berikutnya dan lakukan cek validitas yang sama)
+            - rekam path setelah berhasil meletakkan block
+            - lakukan backtracking jika terjebak di jalan buntu
+          */
+        // GOAL: seluruh papan terisi & semua blok telah digunakan.
+
+        PuzzleBoard board = new PuzzleBoard(N, M, S);
+
+        if (S.equalsIgnoreCase("CUSTOM")) {
+            board.insertCustomConfiguration(Arrays.copyOfRange(parsedFile, 2, 2 + N));
+        }
+
+        Path path = new Path(block_ids);
+        board.buildBoard();
+        board.printBoard();
+        
+        boolean answerFound = false;
+        ArrayList<ArrayList<Character>> remainingBlocksPermutations = path.generateRemainingBlocksPermutations();
+        for (int i = 0; i < remainingBlocksPermutations.size(); i++) {
+            if (board.solvePuzzle(0, remainingBlocksPermutations.get(i), path.placedBlocks, blocks, path)) {
+                answerFound = true;
+                break;
+            }
+        }
+        if (answerFound == true) {
+            System.out.println("\nanswer was found");
+            board.printBoard();
+        }
+        else {
+            System.out.println("\nanswer was not found");
+            board.printBoard();
         }
     }
-
 
     // MAIN FUNCTIONS
     // function to parse input file

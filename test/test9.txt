@@ -1,0 +1,33 @@
+5 11 12
+DEFAULT
+AAA
+  AA
+BBB
+  B
+  B
+C
+CC
+DDDD
+ D
+EE
+EE
+E
+  F
+FFF
+ F
+GG
+ GG
+  G
+HH
+H
+H
+II
+I
+I
+I
+J J
+JJJ
+KK
+ KK
+LLL
+ L

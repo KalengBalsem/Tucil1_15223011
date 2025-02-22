@@ -1,4 +1,4 @@
-5 5 8
+5 5 7
 DEFAULT
 A
 AA
