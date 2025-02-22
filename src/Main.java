@@ -1,14 +1,16 @@
+import java.io.BufferedReader;
+import java.io.FileWriter;
+import java.io.InputStreamReader;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class Main {
     public static void main(String[] args) throws Exception {
         // MEMBACA FILE "*.TXT"
         // Scanner object untuk user input
-        Scanner scanner = new Scanner(System.in);
-        // Prompt user to enter filename
-        System.out.print("Enter filename (including .txt): "); // e.g.: ./test/test1.txt
-        String filename = scanner.nextLine();
-        scanner.close();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        System.out.print("Enter filename (including .txt): ");      // e.g.: ./test/test1.txt
+        String filename = reader.readLine();
 
         String fileContent = ReadFile.readFile(filename);
         String[] parsedFile = parseFile(fileContent);
@@ -30,17 +32,13 @@ public class Main {
             startParsingBlocks = 2;
         }
         else if (S.equalsIgnoreCase("CUSTOM")) {
-            startParsingBlocks = 2 + N; // block dalam .txt berada di bawah konfigurasi papan CUSTOM yang setinggi N.
+            startParsingBlocks = 2 + N;                              // block dalam .txt berada di bawah konfigurasi papan CUSTOM yang setinggi N.
         } 
         else {
             throw new java.lang.Error("Board category invalid. Board category seharusnya DEFAULT atau CUSTOM.");
         }
-
-        // mengecek validitas parameter
-        
-
-        
-        // MEMPROSES BLOK PUZZLE
+ 
+        // MEMBACA BLOK PUZZLE
         // menyortir blok dan menyetor data arrangement pertama tiap blok
         int row = 0;
         int column = 0;
@@ -72,6 +70,14 @@ public class Main {
             row++;
         }
 
+        // mengecek validitas parameter dan input (CONSTRAINTS)
+        /*
+         * LIST:
+         * - cek apakah block_unique_ids.size() = block_ids.size() untuk cek apakah ada ID duplikat
+         * - cek apakah block_ids.size() == P?
+         */
+
+        // MEMPROSES BLOK PUZZLE
         // menciptakan semua kemungkinan variasi tiap blok (rotasi dan cermin)
         for (Map.Entry<Character, ArrayList<ArrayList<Pair>>> entry : blocks.entrySet()) {
             // take id and entry
@@ -80,13 +86,13 @@ public class Main {
             ArrayList<ArrayList<Pair>> newVariations = new ArrayList<>();
             // ROTATION
             int num_of_rotation = 3; // variasi rotasi <= 3
-            ArrayList<Pair> arrangement = arrangements.get(0); // starting arrangement
+            ArrayList<Pair> arrangement = arrangements.get(0);     // starting arrangement
             for (int i = 0; i < num_of_rotation; i ++) {
                 arrangement = Transform.rotateCW(arrangement);
                 newVariations.add(arrangement);
             }
             // // END ROTATION
-            blocks.get(id).addAll(newVariations); // add rotation variations to the arrangements (before they are mirrored.)
+            blocks.get(id).addAll(newVariations);                       // add rotation variations to the arrangements (before they are mirrored.)
             newVariations = new ArrayList<>();
             // MIRROR
             for (ArrayList<Pair> arr : arrangements) {
@@ -96,7 +102,7 @@ public class Main {
                 newVariations.add(arrangement);
             }
             // // END MIRROR
-            blocks.get(id).addAll(newVariations); // add mirror variations to the arrangements.
+            blocks.get(id).addAll(newVariations);                       // add mirror variations to the arrangements.
         }
 
         // membersihkan variasi tiap blok (agar tidak ada variasi duplikat)
@@ -113,35 +119,48 @@ public class Main {
         ArrayList<Character> singleBlockPermutation = block_ids;
         Collections.sort(singleBlockPermutation);
 
-        // Tes permutasi pertama dari block_ids
+        long startTime = System.currentTimeMillis();                    // mengukur waktu awal algoritma
+        // Permutasi pertama dari block_ids
         if (board.solvePuzzle(0, singleBlockPermutation, path.placedBlocks, blocks, path)) {
             answerFound = true;
         }
-        System.out.println(singleBlockPermutation);
         // Menghasilkan permutasi baru di tiap loop sembari mencoba apakah permutasi tersebut dapat menyelesaikan IQ Puzzler Pro
         while (!answerFound && nextPermutation(singleBlockPermutation)) {
-            System.out.println(singleBlockPermutation);
             if (board.solvePuzzle(0, singleBlockPermutation, path.placedBlocks, blocks, path)) {
                 answerFound = true;
             }
         }
-        
+        long endTime = System.currentTimeMillis();;                     // mengukur waktu akhir algoritma
+        long executionTime = endTime - startTime;                       // Waktu eksekusi dalam milisecond
+
+        // OUTPUT PRINT
         if (answerFound == true) {
-            System.out.println("\nanswer was found");
             board.printBoard();
         }
         else {
-            System.out.println("\nanswer was not found");
-            board.printBoard();
+            System.out.println("\nSolusi tidak ditemukan.");
         }
-        path.printPaths();
+        System.out.println("\n" + "Waktu pencarian: " + executionTime + " ms");
+        System.out.println("\n" + "Banyak kasus yang ditinjau: " + path.exploredCases);
+        System.out.println("\n" + "Apakah anda ingin menyimpan solusi? (ya/tidak) ");
+        String menyimpanSolusi = reader.readLine();
+        
+        // MENYIMPAN SOLUSI
+        String inputFilename = Paths.get(filename).getFileName().toString().replaceAll("\\.txt$", ""); // Get file name
+        if (menyimpanSolusi.equalsIgnoreCase("ya")){
+            try (FileWriter writer = new FileWriter(String.format("test_output/%s_output.txt", inputFilename))) {
+                    writer.write(board.boardToText());
+                    System.out.println("File saved successfully as 'output.txt'.");
+            }
+            PrettyOutput.generatePuzzleImage(board.board, String.format("test_output/%s.png", inputFilename));
+        }
     }
 
-    
+
     // HELPER FUNCTIONS
     // function to parse input file
     public static String[] parseFile(String args) {
-        String[] texts = args.split("\n"); // Split by new line
+        String[] texts = args.split("\n");                  // Split by new line
         return texts;
     }
 
@@ -149,7 +168,7 @@ public class Main {
     public record Pair(int row, int column) {
         @Override
         public String toString() {
-            return "(" + row + "," + column + ")";  // for better formatting
+            return "(" + row + "," + column + ")";                // for better formatting
         }
     }
 

@@ -4,6 +4,7 @@ import java.util.HashMap;
 public class Path {
     private HashMap<Character, Integer> path;
     public ArrayList<Character> placedBlocks;
+    public long exploredCases = 0;
 
     // Instantiation
     public Path(ArrayList<Character> ids) {

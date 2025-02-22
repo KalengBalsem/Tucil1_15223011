@@ -3,8 +3,8 @@ public class PuzzleBoard {
     private int rows;
     private int columns;
     private String category;
-    private char[][] board;
     private String[] customConfiguration;
+    public char[][] board;
 
     // object instantiation
     public PuzzleBoard(int rows, int columns, String category) {
@@ -76,6 +76,8 @@ public class PuzzleBoard {
     }
 
     public boolean solvePuzzle(Integer blockIndex, ArrayList<Character> block_ids, ArrayList<Character> placedBlocks, HashMap<Character, ArrayList<ArrayList<Main.Pair>>> blocks, Path path) {
+        path.exploredCases++; // menghitung jumlah iterasi ditinjau dari algorima rekursif
+
         if (this.gameFinishStatus() && placedBlocks.size() == block_ids.size()) {
             return true;
         } else {
@@ -93,6 +95,8 @@ public class PuzzleBoard {
                         return true;
                     }
                     // backtrack
+                    path.exploredCases++; // menghitung jumlah iterasi ditinjau dari algorima backtrack
+
                     // reset blok yang telah diletakkan menjadi "0" kembali
                     for (int r = 0; r < rows; r++) {
                         for (int c = 0; c < columns; c++) {
@@ -131,11 +135,28 @@ public class PuzzleBoard {
         }
         return new Main.Pair(-1, -1);
     }
-    
+
     public void printBoard() {
         for (char[] row : board) {
-            System.out.println(new String(row));
+            StringBuilder coloredRow = new StringBuilder();
+            for (char column : row) {
+                coloredRow.append(PrettyOutput.getColoredChar(column)).append(" "); // Space for better readability
+            }
+            System.out.println(coloredRow);
         }
+    }
+
+    public String boardToText() {
+        List<String> boardText = new ArrayList<>();
+        for (char[] row : board) {
+            StringBuilder coloredRow = new StringBuilder();
+            for (char column : row) {
+                char plainChar = column;
+                coloredRow.append(plainChar);
+            }
+            boardText.add(coloredRow.toString());
+        }
+        return String.join("\n", boardText); // Join rows with newline characters
     }
 
     private boolean isValidPosition(int row, int column) {

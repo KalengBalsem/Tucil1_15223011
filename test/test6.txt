@@ -6,7 +6,7 @@ XXXXX
 .XXX.
 .XXX.
 HH
-HHH
+H
 III
  I
  I
