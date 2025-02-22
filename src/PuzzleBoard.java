@@ -1,7 +1,4 @@
 import java.util.*;
-
-import javax.management.RuntimeErrorException;
-
 public class PuzzleBoard {
     private int rows;
     private int columns;
@@ -27,6 +24,7 @@ public class PuzzleBoard {
                 }
             }
         }
+        // CUSTOM
         else if (this.category.equalsIgnoreCase("CUSTOM")) {
             for (int r = 0; r < rows; r++) {
                 String customRow = customConfiguration[r];
@@ -50,8 +48,7 @@ public class PuzzleBoard {
     }
 
     public boolean placeBlock(char id, ArrayList<Main.Pair> arrangement, Main.Pair blockAnchor){
-        // memperbaiki block yang tidak start dari (0,0) (agar selalu mulai dari blockAnchor)
-        // (probably need to fix a.k.a simplify this part)
+        // memperbaiki/normalisasi block yang tidak start dari (0,0) (agar tiap arrangement dipastikan memiliki 1 subblock dengan Pair(0,0) yang menempati posisi blockAnchor)
         int first_row = arrangement.get(0).row();
         int first_column = arrangement.get(0).column();
         if (first_row != 0 || first_column != 0) {
@@ -59,8 +56,7 @@ public class PuzzleBoard {
                 arrangement.set(i, new Main.Pair(arrangement.get(i).row() - first_row, arrangement.get(i).column() - first_column));
             }
         }
-
-        // meletakkan block dalam bidang jika memenuhi syarat
+        // meletakkan block dalam bidang jika memenuhi syarat.
         boolean validity = true;
         for (Main.Pair p : arrangement) {
             int row_position = blockAnchor.row() + p.row();
@@ -69,7 +65,6 @@ public class PuzzleBoard {
                 validity = false;
             }
         }
-
         if (validity) {
             for (Main.Pair p : arrangement) {
                 int row_position = blockAnchor.row() + p.row();
@@ -80,37 +75,33 @@ public class PuzzleBoard {
         return validity;
     }
 
-    // solvePuzzle(0, remainingBlocks, placedBlocks, blocks)
-    public boolean solvePuzzle(Integer remainingBlockIndex, ArrayList<Character> remainingBlocks, ArrayList<Character> placedBlocks, HashMap<Character, ArrayList<ArrayList<Main.Pair>>> blocks, Path path) {
-        if (this.gameFinishStatus() && remainingBlocks.size() == 0) {
+    public boolean solvePuzzle(Integer blockIndex, ArrayList<Character> block_ids, ArrayList<Character> placedBlocks, HashMap<Character, ArrayList<ArrayList<Main.Pair>>> blocks, Path path) {
+        if (this.gameFinishStatus() && placedBlocks.size() == block_ids.size()) {
             return true;
         } else {
-            char id = remainingBlocks.get(remainingBlockIndex);
+            char id = block_ids.get(blockIndex);
 
             // note: default path.getPath(id) = -1
-            for (int i = (path.getPath(id) + 1); i < blocks.get(id).size(); i++) {
+            for (int i = 0; i < blocks.get(id).size(); i++) {
                 ArrayList<Main.Pair> arrangement = blocks.get(id).get(i);
                 boolean blockPlaced = this.placeBlock(id, arrangement, this.findEmptyBlockAnchor());
                 if (blockPlaced) {
-                    remainingBlocks.remove(Character.valueOf(id));
-                    placedBlocks.add(id);
                     path.recordPath(id, i);
+                    placedBlocks.add(id);
                     // recursion
-                    if (solvePuzzle(0, remainingBlocks, placedBlocks, blocks, path)) {
+                    if (solvePuzzle(blockIndex + 1, block_ids, placedBlocks, blocks, path)) {
                         return true;
                     }
                     // backtrack
-                    path.resetPath(id);
-                    char lastPlacedBlock = placedBlocks.get(placedBlocks.size() - 1);
+                    // reset blok yang telah diletakkan menjadi "0" kembali
                     for (int r = 0; r < rows; r++) {
                         for (int c = 0; c < columns; c++) {
-                            if (board[r][c] == lastPlacedBlock) {
+                            if (board[r][c] == id) {
                                 board[r][c] = '0';
                             }
                         }
                     }
-                    placedBlocks.remove(placedBlocks.size() - 1);
-                    remainingBlocks.add(0, lastPlacedBlock);
+                    placedBlocks.remove(placedBlocks.size() - 1); // unplace/undo block
                 }
             }
         }
@@ -130,7 +121,7 @@ public class PuzzleBoard {
     }
 
     public Main.Pair findEmptyBlockAnchor() {
-        // check if there are no empty spaces left
+        // mencari blockAnchor (urut dari kiri ke kanan lalu dari atas ke bawah, untuk mencari posisi yang masih kosong)
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < columns; c++) {
                 if (board[r][c] == '0') {
@@ -140,6 +131,7 @@ public class PuzzleBoard {
         }
         return new Main.Pair(-1, -1);
     }
+    
     public void printBoard() {
         for (char[] row : board) {
             System.out.println(new String(row));

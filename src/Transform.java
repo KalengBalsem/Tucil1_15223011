@@ -58,7 +58,7 @@ public class Transform {
         return new Main.Pair(max_row, max_column);
     }
 
-    // ADDITIONAL FUNCTIONS
+    // ADDITIONAL FUNCTION
     public static HashMap<Character, ArrayList<ArrayList<Main.Pair>>> cleanBlockVariations(HashMap<Character, ArrayList<ArrayList<Main.Pair>>> blocks) {
         for (Map.Entry<Character, ArrayList<ArrayList<Main.Pair>>> entry : blocks.entrySet()) {
             // take id and entry

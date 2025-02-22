@@ -2,6 +2,7 @@ import java.util.*;
 
 public class Main {
     public static void main(String[] args) throws Exception {
+        // MEMBACA FILE "*.TXT"
         // Scanner object untuk user input
         Scanner scanner = new Scanner(System.in);
         // Prompt user to enter filename
@@ -13,48 +14,38 @@ public class Main {
         String[] parsedFile = parseFile(fileContent);
 
         // MEMPROSES PARAMETER UTAMA
-        /* 
-         * TODO:
-         * - cek apakah tiap parameter valid?
-        */
-
         // menyortir parameter utama N M P dan S
-        // Split the first line on whitespace
+        // Split baris pertama parsedFile berdasarkan whitespace
         String[] tokens = parsedFile[0].trim().split("\\s+");
 
-        // Parse N, M, P
+        // membaca parameter: N, M, P
         int N = Integer.parseInt(tokens[0]);
         int M = Integer.parseInt(tokens[1]);
         int P = Integer.parseInt(tokens[2]);
 
-        // Read the puzzle type (DEFAULT, CUSTOM, or PYRAMID)
+        // membaca kategori puzzle (DEFAULT, CUSTOM, or PYRAMID)
         String S = parsedFile[1];
-
         int startParsingBlocks = 0;
         if (S.equalsIgnoreCase("DEFAULT")) {
             startParsingBlocks = 2;
         }
         else if (S.equalsIgnoreCase("CUSTOM")) {
             startParsingBlocks = 2 + N; // block dalam .txt berada di bawah konfigurasi papan CUSTOM yang setinggi N.
-            
         } 
         else {
             throw new java.lang.Error("Board category invalid. Board category seharusnya DEFAULT atau CUSTOM.");
         }
 
-        // MEMPROSES BLOK PUZZLE
-        /* 
-         * TODO:
-         * - bagaimana jika input hanya " A" (hanya satu subblok A) tapi terbaca (0,1) alih-alih (0,0)
-        */
+        // mengecek validitas parameter
+        
 
+        
+        // MEMPROSES BLOK PUZZLE
         // menyortir blok dan menyetor data arrangement pertama tiap blok
         int row = 0;
         int column = 0;
         ArrayList<Character> block_ids = new ArrayList<>();
         HashMap<Character, ArrayList<ArrayList<Pair>>> blocks = new HashMap<>();
-
-        int variation_num = 0;
         char id = ' ';  // initialize id
 
         for (int i = startParsingBlocks; i < parsedFile.length; i++) {
@@ -64,7 +55,6 @@ public class Main {
                     break;
                 }
             }
-
             if (!block_ids.contains(id)) {
                 row = 0;
                 column = 0;
@@ -72,19 +62,17 @@ public class Main {
                 blocks.putIfAbsent(id, new ArrayList<>());
                 blocks.get(id).add(new ArrayList<>());
             }
-
             for (char ch: parsedFile[i].toCharArray()){
                 if (!Character.isWhitespace(ch)) {
-                    blocks.get(id).get(variation_num).add(new Pair(row, column));
+                    blocks.get(id).get(0).add(new Pair(row, column)); // menyetor data arrangement pertama untuk block dengan id
                 }
                 column++;
             }
-
             column = 0;
             row++;
         }
 
-        // menciptakan semua kemungkinan variasi tiap blok
+        // menciptakan semua kemungkinan variasi tiap blok (rotasi dan cermin)
         for (Map.Entry<Character, ArrayList<ArrayList<Pair>>> entry : blocks.entrySet()) {
             // take id and entry
             id = entry.getKey();
@@ -114,41 +102,30 @@ public class Main {
         // membersihkan variasi tiap blok (agar tidak ada variasi duplikat)
         blocks = Transform.cleanBlockVariations(blocks);
 
-        // PENYUSUNAN BLOK DALAM PAPAN
-        /*
-         * parameter yang harus diperhatikan:
-         * - blok2 yang sudah diletakkan di dalam papan (sehingga mesin tidak meletakkan blok duplikat)
-         * - keep track of variations that we have tried. (A_1 B_2 ...) if fail we try (A_2 B_1) etc but we're not going to use A_1 as the first placement again.
-         /*
-          STEPS:
-            - build block (DONE)
-            - search posisi yang masi kosong urut kiri ke kanan dan atas ke bawah.
-            - loop untuk memposisikan blok
-            - cek apakah posisi valid (tidak ada bagian blok yang menempati posisi yang sudah terisi).
-                jika valid -> isi; else -> loop variasi hingga memenuhi. (jika tidak ada variasi yang memenuhi -> pindah ke id berikutnya dan lakukan cek validitas yang sama)
-            - rekam path setelah berhasil meletakkan block
-            - lakukan backtracking jika terjebak di jalan buntu
-          */
-        // GOAL: seluruh papan terisi & semua blok telah digunakan.
-
+        // MENYELESAIKAN PUZZLE
         PuzzleBoard board = new PuzzleBoard(N, M, S);
-
         if (S.equalsIgnoreCase("CUSTOM")) {
             board.insertCustomConfiguration(Arrays.copyOfRange(parsedFile, 2, 2 + N));
         }
-
-        Path path = new Path(block_ids);
         board.buildBoard();
-        board.printBoard();
-        
+        Path path = new Path(block_ids);
         boolean answerFound = false;
-        ArrayList<ArrayList<Character>> remainingBlocksPermutations = path.generateRemainingBlocksPermutations();
-        for (int i = 0; i < remainingBlocksPermutations.size(); i++) {
-            if (board.solvePuzzle(0, remainingBlocksPermutations.get(i), path.placedBlocks, blocks, path)) {
+        ArrayList<Character> singleBlockPermutation = block_ids;
+        Collections.sort(singleBlockPermutation);
+
+        // Tes permutasi pertama dari block_ids
+        if (board.solvePuzzle(0, singleBlockPermutation, path.placedBlocks, blocks, path)) {
+            answerFound = true;
+        }
+        System.out.println(singleBlockPermutation);
+        // Menghasilkan permutasi baru di tiap loop sembari mencoba apakah permutasi tersebut dapat menyelesaikan IQ Puzzler Pro
+        while (!answerFound && nextPermutation(singleBlockPermutation)) {
+            System.out.println(singleBlockPermutation);
+            if (board.solvePuzzle(0, singleBlockPermutation, path.placedBlocks, blocks, path)) {
                 answerFound = true;
-                break;
             }
         }
+        
         if (answerFound == true) {
             System.out.println("\nanswer was found");
             board.printBoard();
@@ -157,12 +134,14 @@ public class Main {
             System.out.println("\nanswer was not found");
             board.printBoard();
         }
+        path.printPaths();
     }
 
-    // MAIN FUNCTIONS
+    
+    // HELPER FUNCTIONS
     // function to parse input file
     public static String[] parseFile(String args) {
-        String[] texts = args.split("\n"); // Split by comma, semicolon, or pipe
+        String[] texts = args.split("\n"); // Split by new line
         return texts;
     }
 
@@ -171,6 +150,37 @@ public class Main {
         @Override
         public String toString() {
             return "(" + row + "," + column + ")";  // for better formatting
+        }
+    }
+
+    // permutation function
+    private static boolean nextPermutation(ArrayList<Character> arr) {
+        int n = arr.size();
+        // Find largest index k where arr[k] < arr[k+1].
+        int k = n - 2;
+        while (k >= 0 && arr.get(k) >= arr.get(k + 1)) {
+            k--;
+        }
+        if (k < 0) {
+            return false; // no more permutations
+        }
+        // Find largest index l > k such that arr[k] < arr[l].
+        int l = n - 1;
+        while (arr.get(k) >= arr.get(l)) {
+            l--;
+        }
+        // Swap arr[k] and arr[l].
+        Collections.swap(arr, k, l);
+        // Reverse the sub-list from k+1 to the end.
+        reverse(arr, k + 1, n - 1);
+        return true;
+    }
+
+    private static void reverse(List<Character> arr, int start, int end) {
+        while (start < end) {
+            Collections.swap(arr, start, end);
+            start++;
+            end--;
         }
     }
 }
