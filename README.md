@@ -1,7 +1,9 @@
 # Tucil1-IF2211
 ## Penyelesaian IQ Puzzler Pro dengan Algoritma Brute Force
 
-Program ini merupakan implementasi algoritma Brute Force untuk menyelesaikan permainan IQ Puzzler Pro. Pemain harus mengisi papan berukuran N × M dengan P blok puzzle unik. Program membaca file input yang mendefinisikan ukuran papan, jumlah blok, jenis kasus (DEFAULT atau CUSTOM), dan bentuk setiap blok. Algoritma mencoba semua kemungkinan penyusunan blok dengan rotasi dan pencerminan hingga menemukan solusi yang memenuhi aturan permainan atau menyatakan bahwa tidak ada solusi. Hasilnya ditampilkan dalam format berwarna, mencatat waktu eksekusi serta jumlah iterasi yang dilakukan.
+Program ini merupakan implementasi **algoritma Brute Force** untuk menyelesaikan permainan IQ Puzzler Pro. Pemain harus mengisi papan berukuran N × M dengan P blok puzzle unik. Program membaca file input yang mendefinisikan **ukuran papan, jumlah blok, jenis kasus (DEFAULT atau CUSTOM), dan bentuk setiap blok**. 
+
+Algoritma mencoba semua kemungkinan penyusunan blok dengan **rotasi dan pencerminan** hingga menemukan solusi yang memenuhi aturan permainan atau menyatakan bahwa tidak ada solusi. Hasilnya ditampilkan dalam format berwarna, mencatat waktu eksekusi serta jumlah iterasi yang dilakukan.
 
 ### Beberapa batasan program dan asumsi yang digunakan:
 - Setiap blok puzzle direpresentasikan dengan huruf kapital A-Z, tanpa karakter lain.
@@ -23,14 +25,14 @@ Program ini dibuat dengan Visual Studio Code. Berikut merupakan beberapa *depend
 - (Opsional) Terminal dengan dukungan ANSI escape code untuk output berwarna
 
 ### Instalasi Java (Jika Belum Terinstal)
-Windows: Unduh dan instal dari [`Oracle JDK`](https://www.oracle.com/java/technologies/downloads/?er=221886) atau gunakan[` Adoptium OpenJDK`](https://adoptium.net/).
+Windows: Unduh dan instal dari [`Oracle JDK`](https://www.oracle.com/java/technologies/downloads/?er=221886) atau gunakan[`Adoptium OpenJDK`](https://adoptium.net/).
 
 Linux/macOS:
-    ```
-    sudo apt install openjdk-17-jdk  # Untuk Ubuntu/Debian  
-    brew install openjdk@17          # Untuk macOS dengan Homebrew  
-    ```
-Detail lebih lanjut mengenai java dependency dalam VSCode dapat diakses di [here](https://github.com/microsoft/vscode-java-dependency#manage-dependencies).
+```sh
+sudo apt install openjdk-17-jdk  # Untuk Ubuntu/Debian  
+brew install openjdk@17          # Untuk macOS dengan Homebrew  
+```
+Detail lebih lanjut mengenai java dependency dalam VSCode dapat diakses di [sini](https://github.com/microsoft/vscode-java-dependency#manage-dependencies).
 
 ## Cara Menjalankan dan Menggunakan Program
 ### 1. Pastikan Java Sudah Terinstal
@@ -39,7 +41,7 @@ Cek versi Java yang terinstal dengan perintah:
 ```sh
 java -version
 ```
-Jika belum terinstal, silakan instal sesuai dengan keterangan dalam [Program Requirements & Dependencies](#cara-menjalankan-dan-menggunakan-program)
+Jika belum terinstal, silakan instal sesuai dengan keterangan dalam [Program Requirements & Dependencies](https://github.com/KalengBalsem/Tucil1_15223011?tab=readme-ov-file#program-requirements--dependencies)
 
 ---
 
