@@ -10,7 +10,7 @@ public class PrettyOutput {
     private static final int PADDING = 5;    // Space between cells
     private static final int FONT_SIZE = 30; // Font size for letters
 
-    // 26 distinct RGB colors
+    // 26 distinct RGB colors (untuk A-Z)
     private static final int[][] DISTINCT_COLORS = {
         {255, 0, 0},      // Red
         {0, 255, 0},      // Green
@@ -56,8 +56,8 @@ public class PrettyOutput {
         int rows = board.length;
         int cols = board[0].length;
 
-        int width = cols * (CELL_SIZE + PADDING);
-        int height = rows * (CELL_SIZE + PADDING);
+        int width = cols * (CELL_SIZE + PADDING) - PADDING;
+        int height = rows * (CELL_SIZE + PADDING) - PADDING;
 
         // Create an empty image
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
@@ -75,14 +75,14 @@ public class PrettyOutput {
             for (int col = 0; col < cols; col++) {
                 char piece = board[row][col];
                 if (Character.isLetter(piece)) {
-                    // Get color from PrettyOutput
+                    // Get color
                     Color blockColor = getColorForChar(piece);
                     g2d.setColor(blockColor);
                     g2d.fillRect(col * (CELL_SIZE + PADDING), row * (CELL_SIZE + PADDING), CELL_SIZE, CELL_SIZE);
 
                     // Draw letter in the center of the cell
                     g2d.setColor(Color.BLACK);
-                    g2d.setFont(new Font("Arial", Font.BOLD, FONT_SIZE));
+                    g2d.setFont(new Font("Roboto", Font.PLAIN, FONT_SIZE));
                     FontMetrics fm = g2d.getFontMetrics();
                     int x = col * (CELL_SIZE + PADDING) + (CELL_SIZE - fm.charWidth(piece)) / 2;
                     int y = row * (CELL_SIZE + PADDING) + ((CELL_SIZE - fm.getHeight()) / 2) + fm.getAscent();
