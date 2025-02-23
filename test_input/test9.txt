@@ -1,0 +1,47 @@
+11 13 11
+CUSTOM
+..XXX...XXX..
+.XXXXX.XXXXX.
+XXXXXXXXXXXXX
+XXXXXXXXXXXXX
+XXXXXXXXXXXXX
+.XXXXXXXXXXX.
+..XXXXXXXXX..
+...XXXXXXX...
+....XXXXX....
+.....XXX.....
+......X......
+   KK
+K KK
+KKK
+ K
+AAA
+  AA
+   JJJJ
+JJJJJJ
+J  JJ
+  JJ
+D
+DDD
+ DDDDD
+DD
+FFF
+FFFF
+  F
+EEEE
+   EEE
+     E
+     E
+   GGG
+GGGG GG
+     G
+    C
+CCCCC CC
+    CCC
+BB
+ BBB
+  B
+HH
+ LL
+LL
+L

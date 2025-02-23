@@ -21,7 +21,6 @@ public class Transform {
             new_column = max_row - p.row();
             rotatedArr.add(new Main.Pair(new_row, new_column));
         }
-
         return rotatedArr;
     }
     // mirror functions

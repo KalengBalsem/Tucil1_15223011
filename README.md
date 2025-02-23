@@ -1,9 +1,9 @@
 # Tucil1-IF2211
 ## Penyelesaian IQ Puzzler Pro dengan Algoritma Brute Force
 
-Program ini merupakan implementasi **algoritma Brute Force** untuk menyelesaikan permainan IQ Puzzler Pro. Pemain harus mengisi papan berukuran N × M dengan P blok puzzle unik. Program membaca file input yang mendefinisikan **ukuran papan, jumlah blok, jenis kasus (DEFAULT atau CUSTOM), dan bentuk setiap blok**. 
+> Program ini merupakan implementasi **algoritma Brute Force** untuk menyelesaikan permainan IQ Puzzler Pro. Pemain harus mengisi papan berukuran N × M dengan P blok puzzle unik. Program membaca file input yang mendefinisikan **ukuran papan, jumlah blok, jenis kasus (DEFAULT atau CUSTOM), dan bentuk setiap blok**. 
 
-Algoritma mencoba semua kemungkinan penyusunan blok dengan **rotasi dan pencerminan** hingga menemukan solusi yang memenuhi aturan permainan atau menyatakan bahwa tidak ada solusi. Hasilnya ditampilkan dalam format berwarna, mencatat waktu eksekusi serta jumlah iterasi yang dilakukan.
+> Algoritma mencoba semua kemungkinan penyusunan blok dengan **rotasi dan pencerminan** hingga menemukan solusi yang memenuhi aturan permainan atau menyatakan bahwa tidak ada solusi. Hasilnya ditampilkan dalam format berwarna, mencatat waktu eksekusi serta jumlah iterasi yang dilakukan.
 
 ### Beberapa batasan program dan asumsi yang digunakan:
 - Setiap blok puzzle direpresentasikan dengan huruf kapital A-Z, tanpa karakter lain.
@@ -106,8 +106,8 @@ Program kemudian akan membaca file, memproses puzzle, dan menampilkan hasilnya d
    Banyak kasus yang ditinjau: 7387  
    Apakah anda ingin menyimpan solusi? (ya/tidak)  
    ```
-4. **Jika memilih menyimpan solusi** → File output tersimpan di `test_output/`.
+4. **Jika memilih menyimpan solusi** → File output tersimpan di `test/`.
 
 
-## Tentang Author
+## Author
 Program ini dibuat oleh Asybel Bintang (NIM: 15223011)

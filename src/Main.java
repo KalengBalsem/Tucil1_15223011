@@ -32,7 +32,7 @@ public class Main {
             startParsingBlocks = 2;
         }
         else if (S.equalsIgnoreCase("CUSTOM")) {
-            startParsingBlocks = 2 + N;                              // block dalam .txt berada di bawah konfigurasi papan CUSTOM yang setinggi N.
+            startParsingBlocks = 2 + N;                              // input block dalam .txt berada di bawah konfigurasi papan CUSTOM yang setinggi N.
         } 
         else {
             throw new java.lang.Error("Board category invalid. Board category seharusnya DEFAULT atau CUSTOM.");
@@ -40,19 +40,34 @@ public class Main {
  
         // MEMBACA BLOK PUZZLE
         // menyortir blok dan menyetor data arrangement pertama tiap blok
+        HashMap<Character, ArrayList<ArrayList<Pair>>> blocks = new HashMap<>();
+        ArrayList<Character> block_ids = new ArrayList<>();
+        char id = ' ';  // initialize id
+        
+        Set<Character> seen_ids = new HashSet<>();
         int row = 0;
         int column = 0;
-        ArrayList<Character> block_ids = new ArrayList<>();
-        HashMap<Character, ArrayList<ArrayList<Pair>>> blocks = new HashMap<>();
-        char id = ' ';  // initialize id
-
         for (int i = startParsingBlocks; i < parsedFile.length; i++) {
-            for (char ch: parsedFile[i].toCharArray()){
+            boolean foundAlphabet = false;
+            Character current_id = ' ';
+            for (char ch: parsedFile[i].toCharArray()) {
                 if (Character.isAlphabetic(ch)) {
-                    id = ch;
+                    current_id = ch;
+                    foundAlphabet = true;
                     break;
                 }
             }
+            // Jika tidak ada karakter alfabet yang ditemukan dalam suatu line, input invalid.
+            if (!foundAlphabet) {
+                throw new IllegalArgumentException("Invalid input at line " + (i + 1) + ": Tidak ada karakter alfabet yang ditemukan.");
+            }
+            // Jika id blok ini sudah pernah diinput sebelumnya, tetapi bukan id terakhir yang diinput -> blok diskontinu
+            if (seen_ids.contains(current_id) && !current_id.equals(id)) {
+                throw new IllegalArgumentException("Invalid input at line " + (i + 1) + ": Blok dengan id '" + current_id + "' diskontinu.");
+            }
+            // Menyetor data blok jika telah dibuktikan valid
+            seen_ids.add(current_id);
+            id = current_id;
             if (!block_ids.contains(id)) {
                 row = 0;
                 column = 0;
@@ -60,23 +75,30 @@ public class Main {
                 blocks.putIfAbsent(id, new ArrayList<>());
                 blocks.get(id).add(new ArrayList<>());
             }
-            for (char ch: parsedFile[i].toCharArray()){
+            for (char ch: parsedFile[i].toCharArray()) {
                 if (!Character.isWhitespace(ch)) {
-                    blocks.get(id).get(0).add(new Pair(row, column)); // menyetor data arrangement pertama untuk block dengan id
+                    blocks.get(id).get(0).add(new Pair(row, column)); // Menyimpan koordinat blok pertama
                 }
                 column++;
             }
             column = 0;
             row++;
+        }        
+
+        // Mengecek validitas input (CONSTRAINTS)
+        // Mengecek apakah parameter P (jumlah blok) sesuai dengan jumlah id terdaftar
+        if (block_ids.size() != P) {
+            throw new java.lang.Error("Parameter input P (jumlah blok) tidak sesuai dengan jumlah id blok unik yang terdaftar." + "\n\nJumlah id terdaftar: " + block_ids.size() + "\nP input: " + P + "\n");
         }
 
-        // mengecek validitas parameter dan input (CONSTRAINTS)
-        /*
-         * LIST:
-         * - cek apakah block_unique_ids.size() = block_ids.size() untuk cek apakah ada ID duplikat
-         * - cek apakah block_ids.size() == P?
-         */
-
+        // Tidak ada dua blok yang direpresentasikan alfabet yang sama.
+        Set<Character> uniqueBlock_ids = new HashSet<>();
+        for (Character block_id : block_ids) {
+            if (!uniqueBlock_ids.add(block_id)) { // Jika gagal ditambahkan, berarti sudah ada duplikat.
+                throw new java.lang.Error("Terdapat blok yang direpresentasikan alfabet yang sama.");
+            }
+        }
+        
         // MEMPROSES BLOK PUZZLE
         // menciptakan semua kemungkinan variasi tiap blok (rotasi dan cermin)
         for (Map.Entry<Character, ArrayList<ArrayList<Pair>>> entry : blocks.entrySet()) {
@@ -91,7 +113,6 @@ public class Main {
                 arrangement = Transform.rotateCW(arrangement);
                 newVariations.add(arrangement);
             }
-            // // END ROTATION
             blocks.get(id).addAll(newVariations);                       // add rotation variations to the arrangements (before they are mirrored.)
             newVariations = new ArrayList<>();
             // MIRROR
@@ -101,11 +122,10 @@ public class Main {
                 arrangement = Transform.mirrorH(arr);
                 newVariations.add(arrangement);
             }
-            // // END MIRROR
             blocks.get(id).addAll(newVariations);                       // add mirror variations to the arrangements.
         }
 
-        // membersihkan variasi tiap blok (agar tidak ada variasi duplikat)
+        // membersihkan variasi tiap blok (memastikan tiap variasi unik dan tidak ada duplikat)
         blocks = Transform.cleanBlockVariations(blocks);
 
         // MENYELESAIKAN PUZZLE
@@ -142,9 +162,11 @@ public class Main {
         }
         System.out.println("\n" + "Waktu pencarian: " + executionTime + " ms");
         System.out.println("\n" + "Banyak kasus yang ditinjau: " + path.exploredCases);
-        System.out.println("\n" + "Apakah anda ingin menyimpan solusi? (ya/tidak) ");
+        System.out.println("\n" + "Apakah Anda ingin menyimpan solusi? (ya/tidak) ");
         String menyimpanSolusi = reader.readLine();
-        
+        System.out.println("\n" + "Apakah Anda ingin menyimpan solusi dalam bentuk gambar (.png)? (ya/tidak) ");
+        String menyimpanSolusiGambar = reader.readLine();
+
         // MENYIMPAN SOLUSI
         String inputFilename = Paths.get(filename).getFileName().toString().replaceAll("\\.txt$", ""); // Get file name
         if (menyimpanSolusi.equalsIgnoreCase("ya")){
@@ -152,6 +174,8 @@ public class Main {
                     writer.write(board.boardToText());
                     System.out.println("File saved successfully as 'output.txt'.");
             }
+        }
+        if (menyimpanSolusiGambar.equalsIgnoreCase("ya")) {
             PrettyOutput.generatePuzzleImage(board.board, String.format("test/%s.png", inputFilename));
         }
     }
