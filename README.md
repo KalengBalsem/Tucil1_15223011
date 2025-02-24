@@ -110,4 +110,6 @@ Program kemudian akan membaca file, memproses puzzle, dan menampilkan hasilnya d
 
 
 ## Author
-Program ini dibuat oleh Asybel Bintang (NIM: 15223011)
+| Nama | NIM | Kelas IF2211
+| --- | --- | --- |
+| Asybel Bintang | 15223011 | K1 |
