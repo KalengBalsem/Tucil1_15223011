@@ -87,6 +87,11 @@ public class Main {
 
         // Mengecek validitas input (CONSTRAINTS)
         // Mengecek apakah parameter P (jumlah blok) sesuai dengan jumlah id terdaftar
+        // ukuran blok valid
+        if (N < 1 || M < 1) {
+            throw new java.lang.Error("Ukuran papan (N dan M) minimal 1");
+        }
+        
         if (block_ids.size() != P) {
             throw new java.lang.Error("Parameter input P (jumlah blok) tidak sesuai dengan jumlah id blok unik yang terdaftar." + "\n\nJumlah id terdaftar: " + block_ids.size() + "\nP input: " + P + "\n");
         }
@@ -162,21 +167,24 @@ public class Main {
         }
         System.out.println("\n" + "Waktu pencarian: " + executionTime + " ms");
         System.out.println("\n" + "Banyak kasus yang ditinjau: " + path.exploredCases);
-        System.out.println("\n" + "Apakah Anda ingin menyimpan solusi? (ya/tidak) ");
-        String menyimpanSolusi = reader.readLine();
-        System.out.println("\n" + "Apakah Anda ingin menyimpan solusi dalam bentuk gambar (.png)? (ya/tidak) ");
-        String menyimpanSolusiGambar = reader.readLine();
 
-        // MENYIMPAN SOLUSI
-        String inputFilename = Paths.get(filename).getFileName().toString().replaceAll("\\.txt$", ""); // Get file name
-        if (menyimpanSolusi.equalsIgnoreCase("ya")){
-            try (FileWriter writer = new FileWriter(String.format("test/%s_output.txt", inputFilename))) {
-                    writer.write(board.boardToText());
-                    System.out.println("File saved successfully as 'output.txt'.");
+        if (answerFound == true) {
+            System.out.println("\n" + "Apakah Anda ingin menyimpan solusi? (ya/tidak) ");
+            String menyimpanSolusi = reader.readLine();
+            System.out.println("\n" + "Apakah Anda ingin menyimpan solusi dalam bentuk gambar (.png)? (ya/tidak) ");
+            String menyimpanSolusiGambar = reader.readLine();
+
+            // MENYIMPAN SOLUSI
+            String inputFilename = Paths.get(filename).getFileName().toString().replaceAll("\\.txt$", ""); // Get file name
+            if (menyimpanSolusi.equalsIgnoreCase("ya")){
+                try (FileWriter writer = new FileWriter(String.format("test/%s_output.txt", inputFilename))) {
+                        writer.write(board.boardToText());
+                        System.out.println("File saved successfully as 'output.txt'.");
+                }
             }
-        }
-        if (menyimpanSolusiGambar.equalsIgnoreCase("ya")) {
-            PrettyOutput.generatePuzzleImage(board.board, String.format("test/%s.png", inputFilename));
+            if (menyimpanSolusiGambar.equalsIgnoreCase("ya")) {
+                PrettyOutput.generatePuzzleImage(board.board, String.format("test/%s.png", inputFilename));
+            }
         }
     }
 
